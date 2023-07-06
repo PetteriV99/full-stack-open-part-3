@@ -1,0 +1,23 @@
+{
+  "name": "full-stack-open-part-3",
+  "version": "1.0.0",
+  "description": "Repository for part 3 of Full Stack Open",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PetteriV99/full-stack-open-part-3.git"
+  },
+  "author": "Petteri Vänttinen (PetteriV99)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PetteriV99/full-stack-open-part-3/issues"
+  },
+  "homepage": "https://github.com/PetteriV99/full-stack-open-part-3#readme",
+  "dependencies": {
+    "http": "^0.0.1-security"
+  }
+}
