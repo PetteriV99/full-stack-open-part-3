@@ -60,6 +60,12 @@ app.post('/api/persons', (req, res) => {
     return res.status(400).json({error: 'name or number missing'})
   }
 
+  const checkName = persons.filter(person => person.name === body.name)
+  console.log(checkName)
+  if (checkName.length > 0) {
+    return res.status(400).json({error: 'name must be unique'})
+  }
+
   const person = {
     name: body.name,
     number: body.number,
@@ -73,7 +79,7 @@ app.post('/api/persons', (req, res) => {
 
 app.delete('/api/persons/:id', (req, res) => {
   const id = Number(req.params.id)
-  persons = persons.filter(note => note.id !== id)
+  persons = persons.filter(person => person.id !== id)
 
   res.status(204)
 })
