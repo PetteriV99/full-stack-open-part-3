@@ -1,6 +1,12 @@
 const express = require('express')
+const morgan = require('morgan')
 const app = express()
 app.use(express.json())
+
+morgan.token('body', req => {
+  return JSON.stringify(req.body)
+})
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
 let persons = [
   {
@@ -61,7 +67,6 @@ app.post('/api/persons', (req, res) => {
   }
 
   const checkName = persons.filter(person => person.name === body.name)
-  console.log(checkName)
   if (checkName.length > 0) {
     return res.status(400).json({error: 'name must be unique'})
   }
@@ -89,6 +94,12 @@ app.get('/info', (req, res) => {
   const time = new Date(Date.now())
   res.send(`<div><p>Phonebook has info for ${amount} people</p><p>${time}</p></div>`)
 })
+
+const unknownEndpoint = (req, res) => {
+  res.status(404).send({ error: 'unknown endpoint' })
+}
+
+app.use(unknownEndpoint)
 
 const PORT = 3001
 app.listen(PORT, () => {
