@@ -1,6 +1,5 @@
 {
   "name": "full-stack-open-part-3",
-  "proxy": "http://localhost:3001",
   "version": "1.0.0",
   "description": "Repository for part 3 of Full Stack Open",
   "main": "index.js",
