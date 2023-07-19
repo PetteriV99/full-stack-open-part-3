@@ -26,11 +26,19 @@ app.get('/api/persons', (req, res) => {
 
 app.get('/api/persons/:id', (req, res) => {
   try {
-    const person = Person.findById(req.params.id)
-    if (!person) {
-      return res.status(400).json({ error: 'person not found' })
-    }
-    return res.json(person)
+    Person.findById(req.params.id).then(function(person) {
+      if (person) {
+        res.json(person)
+      } else {
+        res.send(400)
+      }
+    }).catch(function(err){
+      if (err) {
+          console.log(err);
+          res.send(err);
+          throw err;
+      }
+  })
 
   } catch (error) {
     return res.status(500).json({ error: 'Internal server error' })
