@@ -6,82 +6,55 @@ app.use(express.json())
 app.use(cors())
 app.use(express.static('build'))
 
+const Person = require('./models/person')
+
 morgan.token('body', req => {
   return JSON.stringify(req.body)
 })
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
-let persons = [
-  {
-    name: "Arto Hellas",
-    number: "040-123456",
-    id: 1
-  },
-  {
-    name: "Ada Lovelace",
-    number: "39-44-5323523",
-    id: 2
-  },
-  {
-    name: "Dan Abramov",
-    number: "12-43-234345",
-    id: 3
-  },
-  {
-    name: "Mary Poppendieck",
-    number: "39-23-6423122",
-    id: 4
-  }
-
-]
 //test
 app.get('/', (req, res) => {
   res.send('<h1>Hello World!</h1>')
 })
 
 app.get('/api/persons', (req, res) => {
-  res.json(persons)
+  Person.find({}).then(person => {
+    res.json(person)
+  })
 })
 
 app.get('/api/persons/:id', (req, res) => {
-  const id = Number(req.params.id)
-  const person = persons.find(person => person.id === id)
-  if (!person) {
-    res.status(404)
-  }
-  res.json(person)
-})
+  try {
+    const person = Person.findById(req.params.id)
+    if (!person) {
+      return res.status(400).json({ error: 'person not found' })
+    }
+    return res.json(person)
 
-const generateId = () => {
-  const min = Math.ceil(1);
-  const max = Math.floor(1000);
-  const maxId = Math.floor(Math.random() * (max - min) + min)
-  return maxId
-}
+  } catch (error) {
+    return res.status(500).json({ error: 'Internal server error' })
+  }
+})
 
 app.post('/api/persons', (req, res) => {
   const body = req.body
   if (!body) {
-    return res.status(400).json({error: 'request body missing'})
+    return res.status(400).json({ error: 'request body missing' })
   }
 
   if (!body.name || !body.number) {
-    return res.status(400).json({error: 'name or number missing'})
+    return res.status(400).json({ error: 'name or number missing' })
   }
 
-  const checkName = persons.filter(person => person.name === body.name)
-  if (checkName.length > 0) {
-    return res.status(400).json({error: 'name must be unique'})
-  }
-
-  const person = {
+  const person = new Person({
     name: body.name,
     number: body.number,
-    id: generateId()
-  }
+  })
 
-  persons = persons.concat(person)
-  res.json(person)
+  person.save().then(savedPerson => {
+    res.json(savedPerson)
+  })
 
 })
 
