@@ -1,10 +1,14 @@
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
+const mongoose = require('mongoose')
+
 const app = express()
+
 app.use(express.json())
 app.use(cors())
 app.use(express.static('build'))
+
 
 const Person = require('./models/person')
 
@@ -16,33 +20,6 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :b
 //test
 app.get('/', (req, res) => {
   res.send('<h1>Hello World!</h1>')
-})
-
-app.get('/api/persons', (req, res) => {
-  Person.find({}).then(person => {
-    res.json(person)
-  })
-})
-
-app.get('/api/persons/:id', (req, res) => {
-  try {
-    Person.findById(req.params.id).then(function(person) {
-      if (person) {
-        res.json(person)
-      } else {
-        res.send(400)
-      }
-    }).catch(function(err){
-      if (err) {
-          console.log(err);
-          res.send(err);
-          throw err;
-      }
-  })
-
-  } catch (error) {
-    return res.status(500).json({ error: 'Internal server error' })
-  }
 })
 
 app.post('/api/persons', (req, res) => {
@@ -62,6 +39,23 @@ app.post('/api/persons', (req, res) => {
 
   person.save().then(savedPerson => {
     res.json(savedPerson)
+  })
+
+})
+
+app.get('/api/persons', (req, res) => {
+  Person.find({}).then(person => {
+    res.json(person)
+  })
+})
+
+app.get('/api/persons/:id', (req, res) => {
+  const id = req.params.id
+  // Without this validation it is very easy to crash the server
+  if( !mongoose.Types.ObjectId.isValid(id) ) return res.json('invalid id');
+
+  Person.findById(id).then(person => {
+    res.json(person)
   })
 
 })
