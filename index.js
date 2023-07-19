@@ -52,7 +52,7 @@ app.get('/api/persons', (req, res) => {
 app.get('/api/persons/:id', (req, res) => {
   const id = req.params.id
   // Without this validation it is very easy to crash the server
-  if( !mongoose.Types.ObjectId.isValid(id) ) return res.status(400).json({error: 'malformatted id'});
+  if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({ error: 'malformatted id' });
 
   Person.findById(id).then(person => {
     if (person) {
@@ -69,10 +69,13 @@ app.get('/api/persons/:id', (req, res) => {
 })
 
 app.delete('/api/persons/:id', (req, res) => {
-  const id = Number(req.params.id)
-  persons = persons.filter(person => person.id !== id)
+  const id = req.params.id
+  if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({ error: 'malformatted id' });
 
-  res.status(204)
+  Person.findByIdAndDelete(id).then(result => {res.status(204).end()}).catch(error => {
+    console.log(error)
+    res.status(500).end()
+  })
 })
 
 app.get('/info', (req, res) => {
