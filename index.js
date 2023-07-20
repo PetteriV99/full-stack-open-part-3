@@ -39,7 +39,7 @@ app.post('/api/persons', (req, res, next) => {
 
   person.save().then(savedPerson => {
     res.json(savedPerson)
-  }).catch(error => {next(error)})
+  }).catch(error => { next(error) })
 
 })
 
@@ -77,7 +77,7 @@ app.put('/api/persons/:id', (req, res, next) => {
     .then(updatedPerson => {
       res.json(updatedPerson)
     })
-    .catch(error => {next(error)})
+    .catch(error => { next(error) })
 })
 
 app.delete('/api/persons/:id', (req, res, next) => {
@@ -89,10 +89,14 @@ app.delete('/api/persons/:id', (req, res, next) => {
   })
 })
 
-app.get('/info', (req, res) => {
-  const amount = persons.length
-  const time = new Date(Date.now())
-  res.send(`<div><p>Phonebook has info for ${amount} people</p><p>${time}</p></div>`)
+app.get('/info', async (req, res) => {
+  Person.find({}).then(result => {
+    const amount = result.length
+    const time = new Date(Date.now())
+    res.send(`<div><p>Phonebook has info for ${amount} people</p><p>${time}</p></div>`)
+  }).catch(error => {
+    next(error)
+  })
 })
 
 const unknownEndpoint = (req, res) => {
