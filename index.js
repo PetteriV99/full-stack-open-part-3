@@ -9,7 +9,7 @@ app.use(express.json())
 app.use(cors())
 app.use(express.static('build'))
 
-
+const errorHandler = require('./middlewares/errorHandler')
 const Person = require('./models/person')
 
 morgan.token('body', req => {
@@ -22,7 +22,7 @@ app.get('/', (req, res) => {
   res.send('<h1>Hello World!</h1>')
 })
 
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', (req, res, next) => {
   const body = req.body
   if (!body) {
     return res.status(400).json({ error: 'request body missing' })
@@ -39,7 +39,7 @@ app.post('/api/persons', (req, res) => {
 
   person.save().then(savedPerson => {
     res.json(savedPerson)
-  })
+  }).catch(error => {next(error)})
 
 })
 
@@ -49,10 +49,8 @@ app.get('/api/persons', (req, res) => {
   })
 })
 
-app.get('/api/persons/:id', (req, res) => {
+app.get('/api/persons/:id', (req, res, next) => {
   const id = req.params.id
-  // Without this validation it is very easy to crash the server
-  if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({ error: 'malformatted id' });
 
   Person.findById(id).then(person => {
     if (person) {
@@ -62,19 +60,17 @@ app.get('/api/persons/:id', (req, res) => {
       res.status(404).end()
     }
   }).catch(error => {
-    console.log(error)
-    res.status(500).end()
+    next(error)
   })
 
 })
 
-app.delete('/api/persons/:id', (req, res) => {
+app.delete('/api/persons/:id', (req, res, next) => {
   const id = req.params.id
   if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({ error: 'malformatted id' });
 
-  Person.findByIdAndDelete(id).then(result => {res.status(204).end()}).catch(error => {
-    console.log(error)
-    res.status(500).end()
+  Person.findByIdAndDelete(id).then(result => { res.status(204).end() }).catch(error => {
+    next(error)
   })
 })
 
@@ -89,6 +85,7 @@ const unknownEndpoint = (req, res) => {
 }
 
 app.use(unknownEndpoint)
+app.use(errorHandler)
 
 const PORT = 3001
 app.listen(PORT, () => {
