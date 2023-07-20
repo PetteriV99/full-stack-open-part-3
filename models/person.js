@@ -17,7 +17,11 @@ mongoose.connect(url)
 
 const personSchema = new mongoose.Schema({
     name: String,
-    number: String,
+    number: {
+        type: String,
+        minlength: 3,
+        required: true
+    },
 })
 
 personSchema.set('toJSON', {
