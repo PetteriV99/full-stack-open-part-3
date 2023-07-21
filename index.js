@@ -7,7 +7,8 @@ const app = express()
 
 app.use(express.json())
 app.use(cors())
-app.use(express.static('build'))
+
+//app.use(express.static('build'))
 
 const errorHandler = require('./middlewares/errorHandler')
 const Person = require('./models/person')
@@ -39,7 +40,7 @@ app.post('/api/persons', (req, res, next) => {
 
   person.save().then(savedPerson => {
     res.json(savedPerson)
-  }).catch(error => { next(error) })
+  }).catch(error =>  next(error) )
 
 })
 
@@ -73,7 +74,7 @@ app.put('/api/persons/:id', (req, res, next) => {
     number: body.number,
   }
 
-  Person.findByIdAndUpdate(req.params.id, person, { new: true })
+  Person.findByIdAndUpdate(req.params.id, person, { new: true, runValidators: true, context: 'query' })
     .then(updatedPerson => {
       res.json(updatedPerson)
     })
