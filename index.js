@@ -19,7 +19,7 @@ morgan.token('body', req => {
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
 //test
-app.get('/', (req, res) => {
+app.get('/', (_req, res) => {
   res.send('<h1>Hello World!</h1>')
 })
 
@@ -44,7 +44,7 @@ app.post('/api/persons', (req, res, next) => {
 
 })
 
-app.get('/api/persons', (req, res) => {
+app.get('/api/persons', (_req, res) => {
   Person.find({}).then(person => {
     res.json(person)
   })
@@ -83,14 +83,14 @@ app.put('/api/persons/:id', (req, res, next) => {
 
 app.delete('/api/persons/:id', (req, res, next) => {
   const id = req.params.id
-  if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({ error: 'malformatted id' });
+  if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({ error: 'malformatted id' })
 
-  Person.findByIdAndDelete(id).then(result => { res.status(204).end() }).catch(error => {
+  Person.findByIdAndDelete(id).then(function () { res.status(204).end() }).catch(error => {
     next(error)
   })
 })
 
-app.get('/info', async (req, res) => {
+app.get('/info', async (_req, res, next) => {
   Person.find({}).then(result => {
     const amount = result.length
     const time = new Date(Date.now())
@@ -100,7 +100,7 @@ app.get('/info', async (req, res) => {
   })
 })
 
-const unknownEndpoint = (req, res) => {
+const unknownEndpoint = (_req, res) => {
   res.status(404).send({ error: 'unknown endpoint' })
 }
 

@@ -43,6 +43,7 @@ else {
   })
 
   person.save().then(result => {
+    console.log(result)
     console.log(`added ${name} number ${number} to phonebook`)
     mongoose.connection.close()
   })
